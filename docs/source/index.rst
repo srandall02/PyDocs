@@ -44,3 +44,4 @@ Contents
    daily_prev_by_location
    collection_date
    mutation_details
+   daily_lag
