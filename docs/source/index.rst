@@ -29,3 +29,4 @@ Contents
    Global_Prev
    Seq_counts
    Mut_By_Lin
+   auth_setup
