@@ -2,6 +2,7 @@ import sys
 import requests
 import warnings
 import pandas as pd
+
 import authenticate_user
 
 server = 'api.outbreak.info'  # or 'dev.outbreak.info'
@@ -47,10 +48,7 @@ def get_outbreak_data(endpoint, argstring, server=server, auth=None, collect_all
     auth = {'Authorization': str(token)}
     # initial request // used to collect data during recursion or as output of single API call
     url = f'https://{server}/{endpoint}?{argstring}'
-    url = "https://api.outbreak.info/genomics/sequence-count"
-    print("URL", url)
     in_req = requests.get(url, headers=auth)
-    print(in_req)
     if in_req.headers.get('content-type') != 'application/json; charset=UTF-8':
         raise ValueError('Warning!: Potentially missing endpoint. Data not being returned by server.')
     if 400 <= in_req.status_code <= 499:
@@ -199,10 +197,9 @@ def lineage_mutations(pango_lin, mutations=None, freq=0.8, server=server, auth=N
         mutations = " AND " + mutations
         lineages = '' + lineages + '' + mutations # fixed function
     raw_data = get_outbreak_data('genomics/lineage-mutations', f'pangolin_lineage={lineages}', collect_all=False)
-    #print(raw_data)
     key_list = raw_data['results']
     key_list = list(key_list)
- 
+
     for i in key_list: # Returns multiple lineages using ","
         if i == key_list[0]:
             df = pd.DataFrame(raw_data['results'][i])
@@ -277,10 +274,10 @@ def sequence_counts(location=None, cumulative=None, sub_admin=None, server=test_
 
 
 def mutations_by_lineage(mutation, location=None, pango_lin=None, freq=None, server=test_server):
-    """Returns the prevalence of a mutation across specified lineages by location
+    """Returns the prevalence of a mutation or series of mutations across specified lineages by location
 
         Arguments:
-        :param mutations: (Optional). List of mutations separated by AND.
+        :param mutations: (Optional). List of mutations. 
         :param location_id: (Optional). If not specified, return most recent date globally.
         :param pangolin_lineage: (Optional). If not specfied, returns all Pango lineages containing that mutation.
         :param frequency: (Optional) Minimimum frequency threshold for the prevalence of a mutation in a lineage.
@@ -292,24 +289,19 @@ def mutations_by_lineage(mutation, location=None, pango_lin=None, freq=None, ser
          mutation = mutation.replace(" ", "")
          mutation = list(mutation.split(","))
     
-    mutations = '' + ' AND '.join(mutation) + ''   
-         
-    if location and pango_lin:
+    mutations = '' + ','.join(mutation) + ''   
+    if location is not None and pango_lin is not None:
         query = '' + f'mutations={mutations}&location_id={location}&pangolin_lineage={pango_lin}'
-    elif location:
+    elif location is not None:
         query = '' + f'mutations={mutations}&location_id={location}'
+    elif pango_lin is not None:
+        query = '' + f'mutations={mutations}&pangolin_lineage={pango_lin}'
     else:
         query = '' + f'mutations={mutations}'
-        
+
     raw_data = get_outbreak_data('genomics/mutations-by-lineage', f'{query}')
-    
-    for i in mutation: # Returns multiple lineages using ","
-        if i == mutation[0]:
-            df = pd.DataFrame(raw_data['results'][i])
-        else:
-            newdf = pd.DataFrame(raw_data['results'][i]) # append each df
-            df = pd.concat([df, newdf], sort=False)  
-    
+    df = pd.DataFrame(raw_data['results'][mutations])
+
     if isinstance(freq, float) and freq > 0 and freq < 1:
         return df.loc[df['prevalence'] >= freq]
     return df
