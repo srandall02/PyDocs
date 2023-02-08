@@ -30,3 +30,4 @@ Contents
    Seq_counts
    Mut_By_Lin
    auth_setup
+   daily_prev_by_location
