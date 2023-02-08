@@ -13,6 +13,17 @@ Welcome to the Python Outbreak.info API's documentation!
 Here you can find information on the functions you will use to collect and analyze SARS-COV-2  data from the Outbreak.info API. 
 Our package pulls data from the `Outbreak.info API  <https://api.outbreak.info/>`_ and is reflected on our `Outbreak.info web interface <https://outbreak.info/>`_
 
+Getting Started
+----------------
+
+To start using the Python Outbreak package, please run 
+
+```
+python authenticate_user.py
+```
+
+and login using your GISAID credentials in order to generate an API key.
+
 .. note::
 
    This project is under active development.
