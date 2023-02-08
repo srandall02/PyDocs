@@ -18,8 +18,6 @@ sys.path.insert(0, os.path.abspath('./outbreak_data/'))
 # -- Project information -----------------------------------------------------
 
 project = 'Python Outbreak.info API'
-copyright = '2022, Sarah Randall'
-author = 'Sarah Randall'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1'
